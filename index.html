@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCM - Signaux Physiques</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .question-block {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .question-block:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .question-block.correct {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .question-block.incorrect {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .question-block.partial {
+            background: #fff3cd;
+            border-left-color: #ffc107;
+        }
+
+        .question-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .options {
+            margin-top: 15px;
+        }
+
+        .option {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .option input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .option label {
+            cursor: pointer;
+            flex-grow: 1;
+            user-select: none;
+        }
+
+        .option.correct-answer {
+            background: #d4edda;
+            border-color: #28a745;
+        }
+
+        .option.incorrect-answer {
+            background: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        .option.missed-answer {
+            background: #fff3cd;
+            border-color: #ffc107;
+        }
+
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            display: none;
+            line-height: 1.6;
+        }
+
+        .explanation.show {
+            display: block;
+        }
+
+        .explanation strong {
+            color: #667eea;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn-validate {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-validate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+
+        .btn-reset {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .results {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+            display: none;
+            text-align: center;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .results h2 {
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .score {
+            font-size: 3em;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .score-details {
+            font-size: 1.2em;
+            margin-top: 15px;
+            opacity: 0.95;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: white;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌊 QCM - Signaux Physiques</h1>
+            <p>15 questions | Plusieurs réponses possibles par question</p>
+        </div>
+
+        <div class="content">
+            <!-- Question 1 -->
+            <div class="question-block" data-question="1">
+                <div class="question-title">
+                    Question 1 : Qu'est-ce qu'une onde selon le cours ?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q1a" name="q1" value="a">
+                        <label for="q1a">Un déplacement de matière d'un point à un autre</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q1b" name="q1" value="b">
+                        <label for="q1b">Un phénomène physique où une perturbation se déplace sans déplacement de matière en moyenne</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q1c" name="q1" value="c">
+                        <label for="q1c">Un signal électrique uniquement</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q1d" name="q1" value="d">
+                        <label for="q1d">Une perturbation locale qui reste immobile</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponse correcte : b<br>
+                    Une onde est un phénomène physique dans lequel une perturbation locale se déplace dans l'espace sans qu'il y ait de déplacement de matière en moyenne. C'est la définition exacte donnée dans le cours.
+                </div>
+            </div>
+
+            <!-- Question 2 -->
+            <div class="question-block" data-question="2">
+                <div class="question-title">
+                    Question 2 : Qu'est-ce qu'un régime stationnaire ?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q2a" name="q2" value="a">
+                        <label for="q2a">Un régime qui dépend du temps</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q2b" name="q2" value="b">
+                        <label for="q2b">Un régime indépendant du temps où les paramètres ne dépendent que de la position</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q2c" name="q2" value="c">
+                        <label for="q2c">Un système possédant une masse et une énergie constantes (en l'absence de création ou perte)</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q2d" name="q2" value="d">
+                        <label for="q2d">Un régime transitoire</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponses correctes : b, c<br>
+                    Un régime stationnaire est indépendant du temps (les paramètres ne dépendent que de la position). De plus, un système en régime stationnaire possède une masse et une énergie constantes en l'absence de création ou perte.
+                </div>
+            </div>
+
+            <!-- Question 3 -->
+            <div class="question-block" data-question="3">
+                <div class="question-title">
+                    Question 3 : Concernant les ondes mécaniques dans les solides, quelles affirmations sont vraies ?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q3a" name="q3" value="a">
+                        <label for="q3a">Une onde transversale a un mouvement local perpendiculaire à la direction de propagation</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q3b" name="q3" value="b">
+                        <label for="q3b">Une onde longitudinale a un mouvement local parallèle à la direction de propagation</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q3c" name="q3" value="c">
+                        <label for="q3c">Les ondes P (sismiques) sont des ondes transversales</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q3d" name="q3" value="d">
+                        <label for="q3d">Le signal transporté est une déformation locale et réversible de la matière</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponses correctes : a, b, d<br>
+                    Les ondes P (primaires) sont des ondes longitudinales, pas transversales. Les ondes S (secondaires) sont transversales. Les autres affirmations sont correctes selon le cours.
+                </div>
+            </div>
+
+            <!-- Question 4 -->
+            <div class="question-block" data-question="4">
+                <div class="question-title">
+                    Question 4 : Quelles sont les caractéristiques des ondes acoustiques ?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q4a" name="q4" value="a">
+                        <label for="q4a">Elles se propagent uniquement dans les solides</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q4b" name="q4" value="b">
+                        <label for="q4b">Elles ont besoin d'un support matériel pour se déplacer</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q4c" name="q4" value="c">
+                        <label for="q4c">Dans un fluide, il s'agit d'ondes longitudinales</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q4d" name="q4" value="d">
+                        <label for="q4d">Le signal transporté inclut la surpression acoustique</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponses correctes : b, c, d<br>
+                    Les ondes acoustiques se propagent dans tous les milieux matériels (solides ET fluides), donc l'affirmation a est fausse. Elles ont besoin d'un support matériel, sont longitudinales dans les fluides, et transportent la surpression acoustique comme signal.
+                </div>
+            </div>
+
+            <!-- Question 5 -->
+            <div class="question-block" data-question="5">
+                <div class="question-title">
+                    Question 5 : Quelle est la vitesse du son dans l'air à 20°C selon le cours ?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q5a" name="q5" value="a">
+                        <label for="q5a">343 m.s⁻¹</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q5b" name="q5" value="b">
+                        <label for="q5b">1 480 m.s⁻¹</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q5c" name="q5" value="c">
+                        <label for="q5c">3,00 × 10⁸ m.s⁻¹</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q5d" name="q5" value="d">
+                        <label for="q5d">7,74 km.s⁻¹</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponse correcte : a<br>
+                    La vitesse du son dans l'air à 20°C est de 343 m.s⁻¹. La valeur de 1 480 m.s⁻¹ correspond à l'eau, 3,00 × 10⁸ m.s⁻¹ à la lumière dans le vide, et 7,74 km.s⁻¹ aux ondes sismiques P.
+                </div>
+            </div>
+
+            <!-- Question 6 -->
+            <div class="question-block" data-question="6">
+                <div class="question-title">
+                    Question 6 : Concernant les ondes électromagnétiques, quelles affirmations sont correctes ?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q6a" name="q6" value="a">
+                        <label for="q6a">Elles ont besoin d'un milieu matériel pour se propager</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q6b" name="q6" value="b">
+                        <label for="q6b">Elles peuvent traverser le vide spatial</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q6c" name="q6" value="c">
+                        <label for="q6c">Les grandeurs physiques associées sont un champ électrique et un champ magnétique</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q6d" name="q6" value="d">
+                        <label for="q6d">La lumière est une onde électromagnétique</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponses correctes : b, c, d<br>
+                    Les ondes électromagnétiques n'ont PAS besoin de milieu matériel pour se propager (contrairement aux ondes acoustiques et mécaniques). Elles peuvent traverser le vide, associent un champ électrique et magnétique, et la lumière en est un exemple.
+                </div>
+            </div>
+
+            <!-- Question 7 -->
+            <div class="question-block" data-question="7">
+                <div class="question-title">
+                    Question 7 : Pour une onde progressive se propageant dans le sens positif de l'axe (Ox) à la vitesse c, quelle est la forme mathématique correcte ?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q7a" name="q7" value="a">
+                        <label for="q7a">s(x,t) = f(t - x/c)</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q7b" name="q7" value="b">
+                        <label for="q7b">s(x,t) = f(t + x/c)</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q7c" name="q7" value="c">
+                        <label for="q7c">s(x,t) = F(x - ct)</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q7d" name="q7" value="d">
+                        <label for="q7d">s(x,t) = F(x + ct)</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponses correctes : a, c<br>
+                    Pour une propagation dans le sens positif : s(x,t) = f(t - x/c) ou s(x,t) = F(x - ct). Ces deux formes sont équivalentes. Les formes avec + correspondent à une propagation dans le sens négatif.
+                </div>
+            </div>
+
+            <!-- Question 8 -->
+            <div class="question-block" data-question="8">
+                <div class="question-title">
+                    Question 8 : Si deux micros sont espacés de d = 1,00 m et que le son arrive au deuxième micro avec un retard τ = 2,88 ms, quelle est la célérité du son ?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q8a" name="q8" value="a">
+                        <label for="q8a">347 m.s⁻¹</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q8b" name="q8" value="b">
+                        <label for="q8b">288 m.s⁻¹</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q8c" name="q8" value="c">
+                        <label for="q8c">343 m.s⁻¹</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q8d" name="q8" value="d">
+                        <label for="q8d">1 480 m.s⁻¹</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponse correcte : a<br>
+                    Calcul : c = d/τ = 1,00 / (2,88 × 10⁻³) = 347 m.s⁻¹. C'est l'exemple donné dans le cours pour déterminer expérimentalement la célérité du son.
+                </div>
+            </div>
+
+            <!-- Question 9 -->
+            <div class="question-block" data-question="9">
+                <div class="question-title">
+                    Question 9 : Pour un signal sinusoïdal s(x,t) = A₀ sin(ωt - kx + φ₀), quelles relations sont correctes ?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q9a" name="q9" value="a">
+                        <label for="q9a">ω = 2πf où f est la fréquence</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q9b" name="q9" value="b">
+                        <label for="q9b">k = 2π/λ où λ est la longueur d'onde</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q9c" name="q9" value="c">
+                        <label for="q9c">c = λf</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q9d" name="q9" value="d">
+                        <label for="q9d">T = 1/f où T est la période temporelle</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponses correctes : a, b, c, d<br>
+                    Toutes ces relations sont fondamentales pour les ondes sinusoïdales : ω = 2πf, k = 2π/λ, c = λf = ω/k, et T = 1/f. Ces relations relient les grandeurs temporelles et spatiales.
+                </div>
+            </div>
+
+            <!-- Question 10 -->
+            <div class="question-block" data-question="10">
+                <div class="question-title">
+                    Question 10 : Quelles sont les limites du spectre audible par l'être humain selon le cours ?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q10a" name="q10" value="a">
+                        <label for="q10a">20 Hz à 20 kHz</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q10b" name="q10" value="b">
+                        <label for="q10b">20 Hz à 20 000 Hz</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q10c" name="q10" value="c">
+                        <label for="q10c">10 Hz à 10 kHz</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q10d" name="q10" value="d">
+                        <label for="q10d">400 à 800 THz</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponses correctes : a, b<br>
+                    Le spectre audible humain s'étend de 20 Hz à 20 kHz (= 20 000 Hz), donc les deux premières réponses sont équivalentes et correctes. Les fréquences de 400 à 800 THz correspondent au domaine visible (ondes électromagnétiques).
+                </div>
+            </div>
+
+            <!-- Question 11 -->
+            <div class="question-block" data-question="11">
+                <div class="question-title">
+                    Question 11 : Concernant les ondes sismiques P et S, quelles affirmations sont vraies ?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q11a" name="q11" value="a">
+                        <label for="q11a">Les ondes P sont longitudinales</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q11b" name="q11" value="b">
+                        <label for="q11b">Les ondes S sont transversales</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q11c" name="q11" value="c">
+                        <label for="q11c">Les ondes P arrivent en premier lors d'un séisme</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q11d" name="q11" value="d">
+                        <label for="q11d">Les ondes P sont plus rapides que les ondes S</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponses correctes : a, b, c, d<br>
+                    Toutes les affirmations sont correctes. Les ondes P (primaires) sont longitudinales et plus rapides (cₚ = 7,74 km.s⁻¹ dans l'exemple), elles arrivent donc en premier. Les ondes S (secondaires) sont transversales et plus lentes (cₛ = 4,32 km.s⁻¹).
+                </div>
+            </div>
+
+            <!-- Question 12 -->
+            <div class="question-block" data-question="12">
+                <div class="question-title">
+                    Question 12 : Le déphasage entre deux points x₁ et x₀ pour une onde sinusoïdale est donné par quelle formule ?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q12a" name="q12" value="a">
+                        <label for="q12a">Δφ = k(x₁ - x₀)</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q12b" name="q12" value="b">
+                        <label for="q12b">Δφ = 2π(x₁ - x₀)/λ</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q12c" name="q12" value="c">
+                        <label for="q12c">Δφ = ω(x₁ - x₀)/c</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q12d" name="q12" value="d">
+                        <label for="q12d">Δφ = (x₁ - x₀)/c</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponses correctes : a, b, c<br>
+                    Ces trois formules sont équivalentes car k = 2π/λ et k = ω/c. Donc : Δφ = k(x₁ - x₀) = 2π(x₁ - x₀)/λ = ω(x₁ - x₀)/c. La formule d est incorrecte car il manque ω au numérateur.
+                </div>
+            </div>
+
+            <!-- Question 13 -->
+            <div class="question-block" data-question="13">
+                <div class="question-title">
+                    Question 13 : Deux points sont en opposition de phase si :
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q13a" name="q13" value="a">
+                        <label for="q13a">Ils sont séparés par un nombre entier de longueurs d'onde</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q13b" name="q13" value="b">
+                        <label for="q13b">Ils sont séparés par un nombre impair de demi-longueurs d'onde</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q13c" name="q13" value="c">
+                        <label for="q13c">Leur déphasage vaut (2n+1)π avec n entier</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q13d" name="q13" value="d">
+                        <label for="q13d">Ils sont séparés par un quart de longueur d'onde</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponses correctes : b, c<br>
+                    Deux points sont en opposition de phase quand ils sont séparés par un nombre impair de demi-longueurs d'onde (λ/2, 3λ/2, 5λ/2...), ce qui correspond à un déphasage de (2n+1)π. Un quart de longueur d'onde correspond à une quadrature de phase.
+                </div>
+            </div>
+
+            <!-- Question 14 -->
+            <div class="question-block" data-question="14">
+                <div class="question-title">
+                    Question 14 : Concernant un régime permanent, quelles affirmations sont vraies ?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q14a" name="q14" value="a">
+                        <label for="q14a">C'est ce qui survient après la période transitoire</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q14b" name="q14" value="b">
+                        <label for="q14b">Si l'excitation est constante, le régime permanent est stationnaire</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q14c" name="q14" value="c">
+                        <label for="q14c">Si l'excitation est périodique, le régime permanent n'est pas stationnaire</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q14d" name="q14" value="d">
+                        <label for="q14d">C'est une réponse à court terme à l'excitation</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponses correctes : a, b, c<br>
+                    Le régime permanent survient après le régime transitoire (c'est une réponse à LONG terme, pas court terme). Si l'excitation est constante, il est stationnaire ; si elle est périodique, il ne l'est pas.
+                </div>
+            </div>
+
+            <!-- Question 15 -->
+            <div class="question-block" data-question="15">
+                <div class="question-title">
+                    Question 15 : Pour une houle longue avec une fréquence f = 5.10⁻² Hz se propageant à c = 10 m.s⁻¹, quelle est sa longueur d'onde λ ?
+                </div>
+                <div class="options">
+                    <div class="option">
+                        <input type="checkbox" id="q15a" name="q15" value="a">
+                        <label for="q15a">0,5 m</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q15b" name="q15" value="b">
+                        <label for="q15b">200 m</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q15c" name="q15" value="c">
+                        <label for="q15c">20 m</label>
+                    </div>
+                    <div class="option">
+                        <input type="checkbox" id="q15d" name="q15" value="d">
+                        <label for="q15d">100 m</label>
+                    </div>
+                </div>
+                <div class="explanation">
+                    <strong>Correction :</strong>
+                    Réponse correcte : b<br>
+                    Calcul : λ = c/f = 10 / (5×10⁻²) = 10 / 0,05 = 200 m. C'est une très grande longueur d'onde typique des houles longues océaniques.
+                </div>
+            </div>
+
+            <div class="btn-container">
+                <button class="btn btn-validate" onclick="validateQuiz()">Valider le QCM</button>
+                <button class="btn btn-reset" onclick="resetQuiz()">Recommencer</button>
+            </div>
+
+            <div class="results" id="results">
+                <h2>Résultats</h2>
+                <div class="score" id="score">0/20</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress">0%</div>
+                </div>
+                <div class="score-details" id="details"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const answers = {
+            1: ['b'],
+            2: ['b', 'c'],
+            3: ['a', 'b', 'd'],
+            4: ['b', 'c', 'd'],
+            5: ['a'],
+            6: ['b', 'c', 'd'],
+            7: ['a', 'c'],
+            8: ['a'],
+            9: ['a', 'b', 'c', 'd'],
+            10: ['a', 'b'],
+            11: ['a', 'b', 'c', 'd'],
+            12: ['a', 'b', 'c'],
+            13: ['b', 'c'],
+            14: ['a', 'b', 'c'],
+            15: ['b']
+        };
+
+        function validateQuiz() {
+            let totalScore = 0;
+            let correctCount = 0;
+            let partialCount = 0;
+            let incorrectCount = 0;
+
+            for (let q = 1; q <= 15; q++) {
+                const correctAnswers = answers[q];
+                const checkboxes = document.querySelectorAll(`input[name="q${q}"]`);
+                const questionBlock = document.querySelector(`[data-question="${q}"]`);
+                const explanation = questionBlock.querySelector('.explanation');
+                
+                let userAnswers = [];
+                checkboxes.forEach(checkbox => {
+                    const option = checkbox.parentElement;
+                    option.classList.remove('correct-answer', 'incorrect-answer', 'missed-answer');
+                    
+                    if (checkbox.checked) {
+                        userAnswers.push(checkbox.value);
+                    }
+                });
+
+                // Calculer le score pour cette question
+                let questionScore = 0;
+                let correctSelected = 0;
+                let incorrectSelected = 0;
+                let missedAnswers = 0;
+
+                correctAnswers.forEach(ans => {
+                    if (userAnswers.includes(ans)) {
+                        correctSelected++;
+                    } else {
+                        missedAnswers++;
+                    }
+                });
+
+                userAnswers.forEach(ans => {
+                    if (!correctAnswers.includes(ans)) {
+                        incorrectSelected++;
+                    }
+                });
+
+                // Appliquer le barème
+                if (incorrectSelected === 0 && missedAnswers === 0) {
+                    questionScore = 1;
+                } else if (incorrectSelected === 1) {
+                    questionScore = 0.5;
+                } else if (incorrectSelected === 2) {
+                    questionScore = 0.2;
+                } else {
+                    questionScore = 0;
+                }
+
+                totalScore += questionScore;
+
+                // Colorer le bloc question
+                questionBlock.classList.remove('correct', 'incorrect', 'partial');
+                if (questionScore === 1) {
+                    questionBlock.classList.add('correct');
+                    correctCount++;
+                } else if (questionScore > 0) {
+                    questionBlock.classList.add('partial');
+                    partialCount++;
+                } else {
+                    questionBlock.classList.add('incorrect');
+                    incorrectCount++;
+                }
+
+                // Colorer les options
+                checkboxes.forEach(checkbox => {
+                    const option = checkbox.parentElement;
+                    const value = checkbox.value;
+                    
+                    if (correctAnswers.includes(value)) {
+                        if (checkbox.checked) {
+                            option.classList.add('correct-answer');
+                        } else {
+                            option.classList.add('missed-answer');
+                        }
+                    } else if (checkbox.checked) {
+                        option.classList.add('incorrect-answer');
+                    }
+                });
+
+                // Afficher l'explication
+                explanation.classList.add('show');
+            }
+
+            // Afficher les résultats
+            const scoreOn20 = (totalScore / 15 * 20).toFixed(2);
+            const percentage = (totalScore / 15 * 100).toFixed(1);
+            
+            document.getElementById('score').textContent = `${scoreOn20}/20`;
+            document.getElementById('progress').style.width = percentage + '%';
+            document.getElementById('progress').textContent = percentage + '%';
+            document.getElementById('details').innerHTML = `
+                ✅ Questions parfaites : ${correctCount}<br>
+                ⚠️ Questions partielles : ${partialCount}<br>
+                ❌ Questions incorrectes : ${incorrectCount}<br>
+                <br>
+                Score brut : ${totalScore.toFixed(1)}/15
+            `;
+            document.getElementById('results').classList.add('show');
+
+            // Scroll vers les résultats
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function resetQuiz() {
+            // Réinitialiser toutes les cases à cocher
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            // Réinitialiser les classes des blocs questions
+            document.querySelectorAll('.question-block').forEach(block => {
+                block.classList.remove('correct', 'incorrect', 'partial');
+            });
+
+            // Réinitialiser les classes des options
+            document.querySelectorAll('.option').forEach(option => {
+                option.classList.remove('correct-answer', 'incorrect-answer', 'missed-answer');
+            });
+
+            // Masquer les explications
+            document.querySelectorAll('.explanation').forEach(explanation => {
+                explanation.classList.remove('show');
+            });
+
+            // Masquer les résultats
+            document.getElementById('results').classList.remove('show');
+
+            // Scroll vers le haut
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
